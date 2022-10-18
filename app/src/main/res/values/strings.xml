@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Book Reader</string>
+    <string name="create_account">Please enter your identifications in the below form</string>
+</resources>
