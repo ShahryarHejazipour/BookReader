@@ -26,9 +26,13 @@ import com.tispunshahryar960103.bookreader.R
 import com.tispunshahryar960103.bookreader.components.EmailInput
 import com.tispunshahryar960103.bookreader.components.PasswordInput
 import com.tispunshahryar960103.bookreader.components.ReaderLogo
+import com.tispunshahryar960103.bookreader.navigation.ReaderScreens
 
 @Composable
-fun BookReaderLoginScreen(navController: NavController) {
+fun BookReaderLoginScreen(
+    navController: NavController,
+    viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+) {
 
     val showLoginForm = rememberSaveable {
         mutableStateOf(true)
@@ -41,9 +45,15 @@ fun BookReaderLoginScreen(navController: NavController) {
 
             if (showLoginForm.value) UserForm(){email,password ->
                 //todo : FB Login
+                viewModel.signInWithEmailAndPassword(email = email, password = password){
+                    navController.navigate(ReaderScreens.HomeScreen.name)
+                }
             } else {
                 UserForm(isCreateAccount = true) {email,password ->
                     //todo : create FB User account
+                    viewModel.createUserWithEmailAndPassword(email = email, password = password){
+                        navController.navigate(ReaderScreens.HomeScreen.name)
+                    }
                 }
             }
 
