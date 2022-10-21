@@ -73,16 +73,9 @@ fun BookReaderLoginScreen(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colors.secondaryVariant
                 )
-
-
             }
-
-
-
         }
     }
-
-
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
