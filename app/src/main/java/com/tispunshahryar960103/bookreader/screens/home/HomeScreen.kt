@@ -1,33 +1,24 @@
 package com.tispunshahryar960103.bookreader.screens.home
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.tispunshahryar960103.bookreader.R
+import com.tispunshahryar960103.bookreader.components.*
 import com.tispunshahryar960103.bookreader.model.MBook
 import com.tispunshahryar960103.bookreader.navigation.ReaderScreens
 
@@ -41,102 +32,104 @@ fun HomeScreen(navController: NavController) {
         //content
         Surface(modifier = Modifier.fillMaxSize()) {
             // home content
-            HomeContent()
+            HomeContent(navController = navController)
             
         }
     }
 }
 
-@Preview
+//@Preview
 @Composable  
-fun HomeContent(navController: NavController = NavController(LocalContext.current)) {
+fun HomeContent(navController: NavController ) {
+
+      val listOfBooks = listOf(
+       MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null),
+      MBook(id = "dadfa", title = " Again", authors = "All of us", notes = null),
+       MBook(id = "dadfa", title = "Hello ", authors = "The world us", notes = null),
+       MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null),
+       MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null),
+          MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null),
+          MBook(id = "dadfa", title = " Again", authors = "All of us", notes = null),
+          MBook(id = "dadfa", title = "Hello ", authors = "The world us", notes = null),
+          MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null),
+          MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null)
+                           )
+    val email = FirebaseAuth.getInstance().currentUser?.email
+    val currentUserName = if (!email.isNullOrEmpty())
+                         email.split("@")[0]
+                          else "Not available"
+
     
-    Column(modifier = Modifier.padding(2.dp), verticalArrangement = Arrangement.SpaceEvenly) {
+    Column(modifier = Modifier.padding(2.dp), verticalArrangement = Arrangement.Top) {
         Row(modifier = Modifier.align(alignment = Alignment.Start)) {
             TitleSection(label = "Your reading\n " + "activity right now ...")
+            Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.7f))
+            Column {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Profile",
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate(ReaderScreens.StatesScreen.name)
+                        }
+                        .size(45.dp),
+                    tint = MaterialTheme.colors.secondaryVariant
+                )
+                Text(
+                    text = currentUserName,
+                    modifier = Modifier.padding(2.dp),
+                    style = MaterialTheme.typography.overline,
+                    color = Color.Red,
+                    fontSize = 15.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip
+                )
+                Divider()
+            }
 
         }
+        ReadingRightNowArea(books = listOf(), navController = navController)
+        TitleSection(label = "Reading List")
+        BookListArea(listOfBooks = listOfBooks,navController = navController)
+
         
     }
 }
 
-
-//@Preview
 @Composable
-fun ReaderAppBar(
-    title:String="",
-    showProfile:Boolean = true,
-    navController: NavController
-) {
-    TopAppBar(
-        title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (showProfile){
-                       Icon(
-                           imageVector = Icons.Default.Favorite,
-                           contentDescription = "Logo Icon",
-                           modifier = Modifier
-                               .clip(RoundedCornerShape(12.dp))
-                               .scale(0.9f)
-                       )
-                    }
-                    Text(text = title,
-                        color = Color.Red.copy(alpha = 0.7f),
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp))
-                    Spacer(modifier = Modifier.width(150.dp))
-                }
-        },
-        actions = {
-                  IconButton(onClick = { FirebaseAuth.getInstance().signOut()
-                     .run { navController.navigate(ReaderScreens.LoginScreen.name) }
-                  }) {
-                      Icons.Default.Logout.tintColor.green
-                      Icon(
-                          imageVector = Icons.Filled.Logout,
-                          contentDescription = "Logout",
-                          tint = Color.Green
-                      )
+fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
 
-                  }
-        },
-        backgroundColor = Color.Transparent,
-        elevation = 0.dp
-    )
+    HorizontalScrollableArea(listOfBooks){
+        Log.d("TAG", "BookListArea: $it")
+        //todo: on card clicked navigate to the Details
+    }
+
 }
 
 @Composable
-fun TitleSection(modifier: Modifier = Modifier, label:String) {
-    Surface(modifier = modifier.padding(start = 5.dp, top = 1.dp)) {
-        Column {
-            Text(
-                text = label,
-                fontSize = 19.sp,
-                fontStyle = FontStyle.Normal,
-                textAlign = TextAlign.Left
-            )
+fun HorizontalScrollableArea(listOfBooks: List<MBook>,onCardPressed : (String) -> Unit) {
 
+    val scrollState = rememberScrollState()
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(280.dp)
+        .horizontalScroll(scrollState)) {
+        for (book in listOfBooks){
+            ListCard(book){
+
+                onCardPressed(it)
+
+            }
         }
     }
 
+
 }
+
 
 @Composable
 fun ReadingRightNowArea(books:List<MBook>, navController: NavController) {
-
-
-}
-
-
-//@Preview
-@Composable
-fun FABContent(onTap: () -> Unit) {
-    
-    FloatingActionButton(onClick = {onTap()},
-        shape = RoundedCornerShape(50.dp),
-        backgroundColor = Color(0xFF92CBDF)) {
-        Icon(imageVector = Icons.Default.Add,
-            contentDescription = "Add a Book",
-            tint = Color.White)
-    }
+    ListCard()
 
 }
+
