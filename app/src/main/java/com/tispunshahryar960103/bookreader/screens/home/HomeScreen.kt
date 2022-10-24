@@ -28,7 +28,11 @@ fun HomeScreen(navController: NavController) {
 
     Scaffold(topBar = {
                       ReaderAppBar(title = "Book Reader", navController = navController)
-    }, floatingActionButton = {FABContent{}}) {
+    }, floatingActionButton = {
+        FABContent{
+            navController.navigate(ReaderScreens.SearchScreen.name)
+        }
+    }) {
         //content
         Surface(modifier = Modifier.fillMaxSize()) {
             // home content
@@ -130,6 +134,5 @@ fun HorizontalScrollableArea(listOfBooks: List<MBook>,onCardPressed : (String) -
 @Composable
 fun ReadingRightNowArea(books:List<MBook>, navController: NavController) {
     ListCard()
-
 }
 
