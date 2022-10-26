@@ -1,7 +1,6 @@
 package com.tispunshahryar960103.bookreader.data
 
-import com.tispunshahryar960103.bookreader.model.Book
-
+// This Is a ---- Wrapper class ---- for adding Metadata into the response data
 data class DataOrException<T,Boolean,E:Exception>(
     var data: T? = null,
     var loading: Boolean? = null,
