@@ -152,7 +152,7 @@ fun BookRow(
                     fontStyle = FontStyle.Italic,
                     style = MaterialTheme.typography.caption)
 
-               /* Text(text =  "Date: ${book.volumeInfo.publishedDate}",
+                Text(text =  "Date: ${book.volumeInfo.publishedDate}",
                     overflow = TextOverflow.Clip,
                     fontStyle = FontStyle.Italic,
                     style = MaterialTheme.typography.caption)
@@ -160,7 +160,7 @@ fun BookRow(
                 Text(text =  "${book.volumeInfo.categories}",
                     overflow = TextOverflow.Clip,
                     fontStyle = FontStyle.Italic,
-                    style = MaterialTheme.typography.caption)*/
+                    style = MaterialTheme.typography.caption)
             }
 
         }
