@@ -24,13 +24,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.tispunshahryar960103.bookreader.components.InputField
 import com.tispunshahryar960103.bookreader.components.ReaderAppBar
 import com.tispunshahryar960103.bookreader.model.Item
 import com.tispunshahryar960103.bookreader.navigation.ReaderScreens
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+//@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @ExperimentalComposeUiApi
 @Composable
 fun SearchScreen(
@@ -46,7 +47,8 @@ fun SearchScreen(
             //navController.popBackStack()
             navController.navigate(ReaderScreens.HomeScreen.name)
         }
-    }) {
+    }) {padding ->
+
         Surface() {
             Column {
                 SearchForm(
@@ -74,7 +76,18 @@ fun BookList(
 ) {
 
     val listOfBooks = viewModel.list
-    if (viewModel.isLoading){
+
+    LazyColumn(modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp)){
+        items(items = listOfBooks) { book ->
+            BookRow(book, navController)
+
+        }
+
+    }
+
+
+   /* if (viewModel.isLoading){
         Row(
             modifier = Modifier.padding(end = 2.dp),
             horizontalArrangement = Arrangement.SpaceAround,
@@ -92,7 +105,7 @@ fun BookList(
             }
 
         }
-    }
+    }*/
 
 }
 
@@ -112,13 +125,13 @@ fun BookRow(
         Row(modifier = Modifier.padding(5.dp),
             verticalAlignment = Alignment.Top) {
 
-            val imageUrl: String = if(book.volumeInfo.imageLinks.smallThumbnail.isEmpty())
-                "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=80&q=80"
-            else {
+            val imageUrl:String = if (book.volumeInfo.imageLinks.smallThumbnail.isEmpty()) "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=80&q=80"
+            else{
                 book.volumeInfo.imageLinks.smallThumbnail
             }
+
             Image(
-                painter = rememberImagePainter(data = imageUrl),
+                painter = rememberAsyncImagePainter(model = imageUrl),
                 contentDescription = "book image",
                 modifier = Modifier
                     .width(80.dp)
@@ -133,7 +146,7 @@ fun BookRow(
                     fontStyle = FontStyle.Italic,
                     style = MaterialTheme.typography.caption)
 
-                Text(text =  "Date: ${book.volumeInfo.publishedDate}",
+               /* Text(text =  "Date: ${book.volumeInfo.publishedDate}",
                     overflow = TextOverflow.Clip,
                     fontStyle = FontStyle.Italic,
                     style = MaterialTheme.typography.caption)
@@ -141,7 +154,7 @@ fun BookRow(
                 Text(text =  "${book.volumeInfo.categories}",
                     overflow = TextOverflow.Clip,
                     fontStyle = FontStyle.Italic,
-                    style = MaterialTheme.typography.caption)
+                    style = MaterialTheme.typography.caption)*/
             }
 
         }
