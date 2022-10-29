@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <base-config cleartextTrafficPermitted="false">
+
+        <trust-anchors>
+
+            <certificates src="system"/>
+
+        </trust-anchors>
+
+
+    </base-config>
+
+
+    <domain-config cleartextTrafficPermitted="true">
+
+
+        <!--below tag is for presents the Http domain(s){their addresses of their IP addresses} that will have been supported for security-->
+        <domain includeSubdomains="true">googleapis.com</domain>
+
+
+
+    </domain-config>
+
+
+</network-security-config>

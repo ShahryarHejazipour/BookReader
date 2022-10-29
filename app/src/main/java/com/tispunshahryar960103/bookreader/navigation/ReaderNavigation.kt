@@ -1,6 +1,7 @@
 package com.tispunshahryar960103.bookreader.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -12,6 +13,7 @@ import com.tispunshahryar960103.bookreader.screens.splash.SplashScreen
 import com.tispunshahryar960103.bookreader.screens.states.StatesScreen
 import com.tispunshahryar960103.bookreader.screens.update.UpdateScreen
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ReaderNavigation() {
 
