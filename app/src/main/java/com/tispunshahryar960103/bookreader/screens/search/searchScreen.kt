@@ -147,6 +147,7 @@ fun BookRow(
 
             Column {
                 Text(text = book.volumeInfo.title, overflow = TextOverflow.Ellipsis)
+
                 Text(text =  "Author: ${book.volumeInfo.authors}",
                     overflow = TextOverflow.Clip,
                     fontStyle = FontStyle.Italic,
