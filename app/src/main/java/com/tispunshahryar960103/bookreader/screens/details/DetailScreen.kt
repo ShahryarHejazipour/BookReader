@@ -2,9 +2,10 @@ package com.tispunshahryar960103.bookreader.screens.details
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Space
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -13,15 +14,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tispunshahryar960103.bookreader.components.ReaderAppBar
+import com.tispunshahryar960103.bookreader.components.RoundedButton
 import com.tispunshahryar960103.bookreader.data.Resource
 import com.tispunshahryar960103.bookreader.model.Item
+import com.tispunshahryar960103.bookreader.model.MBook
 import com.tispunshahryar960103.bookreader.navigation.ReaderScreens
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -112,12 +120,101 @@ fun ShowBookDetails(bookInfo: Resource<Item>, navController: NavController) {
     )
     Text(text = "Authors: ${bookData?.authors.toString()}")
     Text(text = "PageCount: ${bookData?.pageCount.toString()}")
-    Text(text = "Categories: ${bookData?.categories.toString()}", style = MaterialTheme.typography.subtitle1)
-    Text(text = "Published: ${bookData?.publishedDate.toString()}", style = MaterialTheme.typography.subtitle1)
+    Text(
+        text = "Categories: ${bookData?.categories.toString()}",
+        style = MaterialTheme.typography.subtitle1,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 3
+    )
+    Text(
+        text = "Published: ${bookData?.publishedDate.toString()}",
+        style = MaterialTheme.typography.subtitle1
+    )
     Spacer(modifier = Modifier.width(5.dp))
 
 
+    /*
+    "HtmlCompat" is for convert "html texts" into the clear string texts and vice versa
+     */
+    val cleanDescription = HtmlCompat.fromHtml(bookData!!.description,HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
 
+    /*
+     This is for getting the Device Screen dimensions that  Used for
+      create controllable dimensions in "dp" for each screen size device
+     */
+    val localDims = LocalContext.current.resources.displayMetrics
+
+    Surface(
+        modifier = Modifier
+            .height(localDims.heightPixels.dp.times(0.09f))
+            .padding(4.dp),
+        shape = RectangleShape,
+        border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
+
+        LazyColumn(modifier = Modifier.padding(3.dp)){
+            item {
+                Text(text = cleanDescription)
+            }
+        }
+    }
+
+    //Buttons
+    Row(modifier = Modifier.padding(6.dp), horizontalArrangement = Arrangement.SpaceAround) {
+        RoundedButton(label = "Save"){
+            //Save this book into the FireStore database
+            val book = MBook(
+                title = bookData.title,
+                authors = bookData.authors.toString(),
+                description = bookData.description,
+                categories = bookData.categories.toString(),
+                notes = "",
+                photoUrl = bookData.imageLinks.thumbnail,
+                publishedDate = bookData.publishedDate,
+                pageCount = bookData.pageCount.toString(),
+                rating = 0.0,
+                googleBookId = googleBookId,
+                userId = FirebaseAuth.getInstance().currentUser?.uid.toString())
+
+            saveToFirebase(book = book, navController = navController)
+
+
+        }
+
+        Spacer(modifier = Modifier.width(25.dp))
+
+        RoundedButton(label = "Cancel"){
+            navController.popBackStack()
+
+        }
+    }
+
+
+
+
+
+}
+
+fun saveToFirebase(book: MBook, navController: NavController) {
+    val db = FirebaseFirestore.getInstance()
+    val dbCollection = db.collection("books")
+    if (book.toString().isNotEmpty()){
+        dbCollection.add(book).addOnSuccessListener { documentRef ->
+            val docId = documentRef.id
+            dbCollection.document(docId)
+                .update(hashMapOf("id" to docId) as Map<String, Any>)
+                .addOnCompleteListener { task ->
+                   if (task.isSuccessful){
+                       navController.popBackStack()
+                   }
+                }.addOnFailureListener {
+                    Log.w("Error", "SaveToFirebase: Error Updating Doc", it)
+
+                }
+        }
+
+    }else{
+
+    }
 }
 
 
