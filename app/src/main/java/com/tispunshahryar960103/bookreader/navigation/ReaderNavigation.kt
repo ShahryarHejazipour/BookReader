@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.tispunshahryar960103.bookreader.screens.details.DetailScreen
 import com.tispunshahryar960103.bookreader.screens.details.DetailsViewModel
 import com.tispunshahryar960103.bookreader.screens.home.HomeScreen
+import com.tispunshahryar960103.bookreader.screens.home.HomeScreenViewModel
 import com.tispunshahryar960103.bookreader.screens.login.BookReaderLoginScreen
 import com.tispunshahryar960103.bookreader.screens.search.BookSearchViewModel
 import com.tispunshahryar960103.bookreader.screens.search.SearchScreen
@@ -30,7 +31,8 @@ fun ReaderNavigation() {
             SplashScreen(navController = navController)
         }
         composable(ReaderScreens.HomeScreen.name){
-            HomeScreen(navController = navController)
+            val homeViewModel = hiltViewModel<HomeScreenViewModel>()
+            HomeScreen(navController = navController,homeViewModel)
         }
         composable(ReaderScreens.LoginScreen.name){
             BookReaderLoginScreen(navController = navController)

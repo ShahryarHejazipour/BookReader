@@ -204,7 +204,8 @@ fun saveToFirebase(book: MBook, navController: NavController) {
                 .update(hashMapOf("id" to docId) as Map<String, Any>)
                 .addOnCompleteListener { task ->
                    if (task.isSuccessful){
-                       navController.popBackStack()
+                     //  navController.popBackStack()
+                       navController.navigate(ReaderScreens.SearchScreen.name)
                    }
                 }.addOnFailureListener {
                     Log.w("Error", "SaveToFirebase: Error Updating Doc", it)

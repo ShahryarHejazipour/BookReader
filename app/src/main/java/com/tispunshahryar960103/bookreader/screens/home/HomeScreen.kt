@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.tispunshahryar960103.bookreader.components.*
@@ -24,7 +25,10 @@ import com.tispunshahryar960103.bookreader.navigation.ReaderScreens
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    viewModel: HomeScreenViewModel = hiltViewModel() // OR = viewModel(),
+) {
 
     Scaffold(topBar = {
                       ReaderAppBar(title = "Book Reader", navController = navController)
@@ -36,7 +40,7 @@ fun HomeScreen(navController: NavController) {
         //content
         Surface(modifier = Modifier.fillMaxSize()) {
             // home content
-            HomeContent(navController = navController)
+            HomeContent(navController = navController,viewModel = viewModel)
             
         }
     }
@@ -44,9 +48,20 @@ fun HomeScreen(navController: NavController) {
 
 //@Preview
 @Composable  
-fun HomeContent(navController: NavController ) {
+fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
 
-      val listOfBooks = listOf(
+    var listOfBooks = emptyList<MBook>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
+    if (!viewModel.data.value.data.isNullOrEmpty()){
+        listOfBooks = viewModel.data.value.data!!.toList().filter { mBook ->
+            mBook.userId == currentUser?.uid.toString()
+        }
+        Log.d("Books", "HomeContent: ${listOfBooks.toString()}")
+    }
+
+
+   /*   val listOfBooks = listOf(
        MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null),
       MBook(id = "dadfa", title = " Again", authors = "All of us", notes = null),
        MBook(id = "dadfa", title = "Hello ", authors = "The world us", notes = null),
@@ -57,7 +72,7 @@ fun HomeContent(navController: NavController ) {
           MBook(id = "dadfa", title = "Hello ", authors = "The world us", notes = null),
           MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null),
           MBook(id = "dadfa", title = "Hello Again", authors = "All of us", notes = null)
-                           )
+                           )*/
     val email = FirebaseAuth.getInstance().currentUser?.email
     val currentUserName = if (!email.isNullOrEmpty())
                          email.split("@")[0]
