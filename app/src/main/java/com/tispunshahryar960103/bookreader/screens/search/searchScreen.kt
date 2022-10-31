@@ -76,7 +76,13 @@ fun BookList(
 
     val listOfBooks = viewModel.list
     if (viewModel.isLoading) {
-        LinearProgressIndicator()
+
+        Row(horizontalArrangement = Arrangement.SpaceBetween) {
+
+            LinearProgressIndicator()
+            Text(text = "Loading...")
+        }
+
     }else{
 
         LazyColumn(modifier = Modifier.fillMaxSize(),
