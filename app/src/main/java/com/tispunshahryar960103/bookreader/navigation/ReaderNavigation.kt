@@ -3,7 +3,6 @@ package com.tispunshahryar960103.bookreader.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,8 +44,18 @@ fun ReaderNavigation() {
         composable(ReaderScreens.StatesScreen.name){
             StatesScreen(navController = navController)
         }
-        composable(ReaderScreens.UpdateScreen.name){
-            UpdateScreen(navController = navController)
+        composable(
+            ReaderScreens.UpdateScreen.name + "/{bookItemId}",
+            arguments = listOf(navArgument("bookItemId") {
+                type = NavType.StringType
+            })
+        ){ backStackEntry ->
+            backStackEntry.arguments?.getString("bookItemId").let {
+
+                val viewModel = hiltViewModel<HomeScreenViewModel>()
+
+                UpdateScreen(navController = navController,bookItemId = it.toString(), viewModel = viewModel)
+            }
         }
 
 

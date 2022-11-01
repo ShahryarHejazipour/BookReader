@@ -107,7 +107,7 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
             }
 
         }
-        ReadingRightNowArea(books = listOf(), navController = navController)
+        ReadingRightNowArea(books = listOfBooks, navController = navController)
         TitleSection(label = "Reading List")
         BookListArea(listOfBooks = listOfBooks,navController = navController)
 
@@ -118,15 +118,15 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
 
-    HorizontalScrollableArea(listOfBooks){
+    HorizontalScrollableComponent(listOfBooks){
         Log.d("TAG", "BookListArea: $it")
-        //todo: on card clicked navigate to the Details
+        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
 
 }
 
 @Composable
-fun HorizontalScrollableArea(listOfBooks: List<MBook>,onCardPressed : (String) -> Unit) {
+fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed : (String) -> Unit) {
 
     val scrollState = rememberScrollState()
     Row(modifier = Modifier
@@ -148,6 +148,6 @@ fun HorizontalScrollableArea(listOfBooks: List<MBook>,onCardPressed : (String) -
 
 @Composable
 fun ReadingRightNowArea(books:List<MBook>, navController: NavController) {
-    ListCard()
+   // ListCard()
 }
 
