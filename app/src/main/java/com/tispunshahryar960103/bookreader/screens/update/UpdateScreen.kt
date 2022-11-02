@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.tispunshahryar960103.bookreader.components.InputField
+import com.tispunshahryar960103.bookreader.components.RatingBar
 import com.tispunshahryar960103.bookreader.components.ReaderAppBar
 import com.tispunshahryar960103.bookreader.data.DataOrException
 import com.tispunshahryar960103.bookreader.model.MBook
@@ -106,6 +107,7 @@ fun UpdateScreen(
         
     }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ShowSimpleForm(book: MBook, navController: NavController) {
 
@@ -174,6 +176,13 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
 
     }
     Text(text = "Rating", modifier = Modifier.padding(bottom = 3.dp))
+    book.rating?.toInt().let {
+        RatingBar(rating = it!!){ rating->
+            ratingVal.value = rating
+            Log.d("TAG", "ShowSimpleForm: ${ratingVal.value}")
+        }
+
+    }
 
 
 
