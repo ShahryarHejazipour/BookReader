@@ -3,7 +3,6 @@ package com.tispunshahryar960103.bookreader.screens.update
 import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,10 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -29,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -37,6 +34,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.tispunshahryar960103.bookreader.R
 import com.tispunshahryar960103.bookreader.components.*
 import com.tispunshahryar960103.bookreader.data.DataOrException
 import com.tispunshahryar960103.bookreader.model.MBook
@@ -229,7 +227,39 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
 
         }
         Spacer(modifier = Modifier.width(100.dp))
-        RoundedButton(label = "Delete"){}
+
+        val openDialog = remember{
+            mutableStateOf(false)
+        }
+        if (openDialog.value){
+            ShowAlertDialog(
+                message = stringResource(id = R.string.sure) + "\n" + R.string.action,
+                openDialog = openDialog
+            ){
+                FirebaseFirestore.getInstance()
+                    .collection("books")
+                    .document(book.id!!)
+                    .delete()
+                    .addOnCompleteListener{
+                        if (it.isSuccessful){
+                            openDialog.value = false
+                            /*
+                            Don't popBackStack() if we want the immediate recomposition
+                            of the MainScreen UI, instead navigate to the mainScreen!
+                           */
+
+                           // navController.popBackStack() // this don't recompose home screen and we don't have last data update in home screen
+                            navController.navigate(ReaderScreens.HomeScreen.name) // if we want to see changes in home screen
+                        }
+                    }
+                    .addOnFailureListener{}
+
+            }
+
+        }
+        RoundedButton(label = "Delete"){
+            openDialog.value = true
+        }
     }
 
 
@@ -237,6 +267,8 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
 
 
 }
+
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
