@@ -1,7 +1,10 @@
 package com.tispunshahryar960103.bookreader.screens.update
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,13 +35,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.tispunshahryar960103.bookreader.components.InputField
-import com.tispunshahryar960103.bookreader.components.RatingBar
-import com.tispunshahryar960103.bookreader.components.ReaderAppBar
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
+import com.tispunshahryar960103.bookreader.components.*
 import com.tispunshahryar960103.bookreader.data.DataOrException
 import com.tispunshahryar960103.bookreader.model.MBook
+import com.tispunshahryar960103.bookreader.navigation.ReaderScreens
 import com.tispunshahryar960103.bookreader.screens.home.HomeScreenViewModel
+import com.tispunshahryar960103.bookreader.utils.formatDate
 
+@RequiresApi(Build.VERSION_CODES.N)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun UpdateScreen(
@@ -107,6 +113,7 @@ fun UpdateScreen(
         
     }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ShowSimpleForm(book: MBook, navController: NavController) {
@@ -154,7 +161,7 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
 
                }
            }else{
-               Text("Started on: ${book.startedReading}") //Todo : Format date
+               Text("Started on: ${formatDate(book.startedReading!!)}")
 
            }
 
@@ -169,7 +176,7 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
                     Text(text = "Finished Reading!")
                 }
             }else {
-                Text(text = "Finished on: ${book.finishedReading}") //Todo : Format date
+                Text(text = "Finished on: ${formatDate(book.finishedReading!!)}")
             }
 
         }
@@ -182,6 +189,47 @@ fun ShowSimpleForm(book: MBook, navController: NavController) {
             Log.d("TAG", "ShowSimpleForm: ${ratingVal.value}")
         }
 
+    }
+
+    Spacer(modifier = Modifier.padding(bottom = 15.dp))
+    Row{
+        val changeNotes = book.notes != notesText.value
+        val changeRating = book.rating?.toInt() != ratingVal.value
+        val isFinishedTimestamp = if (isFinishedReading.value) Timestamp.now() else book.finishedReading
+        val isStartedTimestamp = if (isStartedReading.value) Timestamp.now() else book.startedReading
+
+        val bookUpdate = changeNotes || changeRating || isFinishedReading.value || isStartedReading.value
+        val bookToUpdate = hashMapOf(
+            "finished_reading_at" to isFinishedTimestamp,
+            "started_reading_at" to isStartedReading,
+            "rating" to ratingVal.value,
+            "notes" to notesText.value
+        ).toMap()
+
+        RoundedButton(label = "Update"){
+
+            if (bookUpdate){
+                FirebaseFirestore.getInstance()
+                    .collection("books")
+                    .document(book.id!!)
+                    .update(bookToUpdate)
+                    .addOnCompleteListener{
+                        showToast(context,"Updated Book Successfully!")
+                        navController.navigate(ReaderScreens.HomeScreen.name)
+                      //  Log.d("Update", "ShowSimpleForm: ${task.result.toString()}")
+                        
+
+                    }
+                    .addOnFailureListener{
+                        Log.w("Error", "ShowSimpleForm: Error updating document", it)
+                    }
+            }
+
+
+
+        }
+        Spacer(modifier = Modifier.width(100.dp))
+        RoundedButton(label = "Delete"){}
     }
 
 
