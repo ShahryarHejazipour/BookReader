@@ -1,5 +1,7 @@
 package com.tispunshahryar960103.bookreader.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +21,7 @@ import com.tispunshahryar960103.bookreader.screens.splash.SplashScreen
 import com.tispunshahryar960103.bookreader.screens.states.StatesScreen
 import com.tispunshahryar960103.bookreader.screens.update.UpdateScreen
 
+@RequiresApi(Build.VERSION_CODES.N)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ReaderNavigation() {
@@ -42,7 +45,8 @@ fun ReaderNavigation() {
             SearchScreen(navController = navController, viewModel = searchViewModel)
         }
         composable(ReaderScreens.StatesScreen.name){
-            StatesScreen(navController = navController)
+            val homeViewModel = hiltViewModel<HomeScreenViewModel>()
+            StatesScreen(navController = navController,viewModel = homeViewModel)
         }
         composable(
             ReaderScreens.UpdateScreen.name + "/{bookItemId}",

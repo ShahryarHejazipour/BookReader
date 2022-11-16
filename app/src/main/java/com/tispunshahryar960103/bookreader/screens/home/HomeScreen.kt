@@ -13,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -107,7 +109,7 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
             }
 
         }
-        ReadingRightNowArea(books = listOfBooks, navController = navController)
+        ReadingRightNowArea(listOfBooks = listOfBooks, navController = navController)
         TitleSection(label = "Reading List")
         BookListArea(listOfBooks = listOfBooks,navController = navController)
 
@@ -118,6 +120,10 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
 
+    val addedBooks = listOfBooks.filter { mBook ->
+        mBook.startedReading == null && mBook.finishedReading == null
+    }
+
     HorizontalScrollableComponent(listOfBooks){
         Log.d("TAG", "BookListArea: $it")
         navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
@@ -126,19 +132,41 @@ fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
 }
 
 @Composable
-fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed : (String) -> Unit) {
+fun HorizontalScrollableComponent(
+    listOfBooks: List<MBook>,
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+    onCardPressed: (String) -> Unit,
+) {
 
     val scrollState = rememberScrollState()
     Row(modifier = Modifier
         .fillMaxWidth()
         .heightIn(280.dp)
         .horizontalScroll(scrollState)) {
-        for (book in listOfBooks){
-            ListCard(book){
+        if(viewModel.data.value.loading == true){
+            LinearProgressIndicator()
 
-                onCardPressed(book.googleBookId.toString())
+        }else{
+            if (listOfBooks.isNullOrEmpty()){
+                Surface(modifier = Modifier.padding(23.dp)) {
+                    Text(text = "No Books found, Add a Book",
+                    style = TextStyle(
+                        color = Color.Red.copy(alpha = 0.4f),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    ))
+                }
+            }else{
+                for (book in listOfBooks){
+                    ListCard(book){
 
+                        onCardPressed(book.googleBookId.toString())
+
+                    }
             }
+
+        }
+
         }
     }
 
@@ -147,7 +175,17 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed : (Str
 
 
 @Composable
-fun ReadingRightNowArea(books:List<MBook>, navController: NavController) {
+fun ReadingRightNowArea(listOfBooks:List<MBook>, navController: NavController) {
    // ListCard()
+
+    //Filter books by reading now
+    val readingNowList = listOfBooks.filter { mBook ->
+        mBook.startedReading != null && mBook.finishedReading == null
+    }
+
+    HorizontalScrollableComponent(readingNowList){
+        Log.d("TAG", "BoolListArea: $it")
+        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
+    }
 }
 

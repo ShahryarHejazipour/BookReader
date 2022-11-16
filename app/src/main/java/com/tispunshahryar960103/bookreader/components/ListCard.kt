@@ -11,6 +11,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -69,7 +71,7 @@ fun ListCard(book: MBook, onPressedDetails:(String) -> Unit = {}) {
                     Icon(imageVector = Icons.Rounded.FavoriteBorder,
                         contentDescription = "Fav Icon", modifier = Modifier.padding(1.dp))
 
-                    BookRating(score = 3.5)
+                    BookRating(score = book.rating!!)
 
                 }
 
@@ -83,10 +85,19 @@ fun ListCard(book: MBook, onPressedDetails:(String) -> Unit = {}) {
             Text(text = book.authors.toString(),
                 modifier = Modifier.padding(4.dp),
                 style = MaterialTheme.typography.caption) }
+
+        val isStartedReading = remember{
+            mutableStateOf(false)
+        }
+
         Row(horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.Bottom) {
+            isStartedReading.value = book.startedReading != null
 
-            RoundedButton(label = "Reading", radius = 70)
+            RoundedButton(
+                label = if (isStartedReading.value) "Reading" else "Not Started",
+                radius = 70
+            )
 
         }
 
